@@ -271,11 +271,6 @@ class ::OAuth2BasicAuthenticator < Auth::ManagedAuthenticator
         DiscoursePluginRegistry.oauth2_basic_additional_json_paths.each do |detail|
           auth['extra'][detail] = fetched_user_details["extra:#{detail}"]
         end
-        unless auth['confirmed']
-          auth['failed'] = true
-          auth['failed_reason'] = I18n.t("login.not_activated")
-          return auth
-        end
       else
         result = Auth::Result.new
         result.failed = true
