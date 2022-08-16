@@ -1,1 +1,3 @@
-{{ resend-confirm-login-modal }}
+{{#if this.siteSettings.oauth2_enabled && !this.siteSettings.oauth2_email_verified && !email.confirmed}}
+    {{resend-confirm-login-modal}}
+{{#end}}
