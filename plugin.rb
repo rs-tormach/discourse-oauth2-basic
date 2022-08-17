@@ -272,7 +272,7 @@ class ::OAuth2BasicAuthenticator < Auth::ManagedAuthenticator
           auth['extra'][detail] = fetched_user_details["extra:#{detail}"]
         end
 
-        unless auth['confirmed']
+        unless auth['info']['email_verified']
           #} else if (result.reason === "not_activated") {
           #  this.send("showNotActivated", {
           #    username: this.loginName,
@@ -280,8 +280,10 @@ class ::OAuth2BasicAuthenticator < Auth::ManagedAuthenticator
           #    currentEmail: escape(result.current_email),
           #  });
           result = Auth::Result.new
-          result.failed = true
-          result.failed_reason = "not_activated"
+          result.email = auth['info']['email']
+          result.name = auth['info']['name']
+          result.username = auth['info']['nickname']
+          result.awaiting_activation = true
           return result
         end
       else
