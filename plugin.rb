@@ -274,7 +274,7 @@ class ::OAuth2BasicAuthenticator < Auth::ManagedAuthenticator
         end
 
         unless auth['info']['email_verified']
-          auth[:session][:email] = { value: auth['info']['email'], expires: 1.day.from_now }
+          auth[:session][:destination_url] = "https://localhost/?email=#{auth['info']['email']}"
         end
       else
         result = Auth::Result.new
@@ -289,12 +289,6 @@ class ::OAuth2BasicAuthenticator < Auth::ManagedAuthenticator
 
   def enabled?
     SiteSetting.oauth2_enabled
-  end
-
-  def cookies
-    # helpers not available in --api mode
-    Discourse.
-    request.cookie_jar
   end
 end
 
