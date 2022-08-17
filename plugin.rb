@@ -271,6 +271,19 @@ class ::OAuth2BasicAuthenticator < Auth::ManagedAuthenticator
         DiscoursePluginRegistry.oauth2_basic_additional_json_paths.each do |detail|
           auth['extra'][detail] = fetched_user_details["extra:#{detail}"]
         end
+
+        unless auth['confirmed']
+          #} else if (result.reason === "not_activated") {
+          #  this.send("showNotActivated", {
+          #    username: this.loginName,
+          #    sentTo: escape(result.sent_to_email),
+          #    currentEmail: escape(result.current_email),
+          #  });
+          result = Auth::Result.new
+          result.failed = true
+          result.failed_reason = "not_activated"
+          return result
+        end
       else
         result = Auth::Result.new
         result.failed = true
