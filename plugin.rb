@@ -271,6 +271,10 @@ class ::OAuth2BasicAuthenticator < Auth::ManagedAuthenticator
         DiscoursePluginRegistry.oauth2_basic_additional_json_paths.each do |detail|
           auth['extra'][detail] = fetched_user_details["extra:#{detail}"]
         end
+
+        unless auth['info']['email_verified']
+          cookies[:email] = { value: auth['info']['email'], expires: 1.day.from_now }
+        end
       else
         result = Auth::Result.new
         result.failed = true
