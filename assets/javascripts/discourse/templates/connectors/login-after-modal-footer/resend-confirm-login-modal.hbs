@@ -1,0 +1,6 @@
+{{#if this.siteSettings.oauth2_enabled}}
+  {{#unless enable_local_logins}}
+    <pre>{{email}}</pre>
+    {{resend-confirm-login-modal}}
+  {{/unless}}
+{{/if}}
