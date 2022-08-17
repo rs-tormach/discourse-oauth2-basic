@@ -7,9 +7,9 @@
 # url: https://github.com/discourse/discourse-oauth2-basic
 # transpile_js: true
 
-require 'action_dispatch/middleware/cookies'
 enabled_site_setting :oauth2_enabled
 
+#require 'action_dispatch/middleware/cookies'
 class ::OmniAuth::Strategies::Oauth2Basic < ::OmniAuth::Strategies::OAuth2
   option :name, "oauth2_basic"
 
@@ -43,6 +43,11 @@ class ::OmniAuth::Strategies::Oauth2Basic < ::OmniAuth::Strategies::OAuth2
     k = keys.shift
     result = obj.respond_to?(k) ? obj.send(k) : obj[k]
     keys.empty? ? result : recurse(result, keys)
+  end
+
+  def cookies
+    # helpers not available in --api mode
+    request.cookie_jar
   end
 end
 
