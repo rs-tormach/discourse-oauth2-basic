@@ -274,7 +274,7 @@ class ::OAuth2BasicAuthenticator < Auth::ManagedAuthenticator
         end
 
         unless auth['info']['email_verified']
-          cookies[:email] = { value: auth['info']['email'], expires: 1.day.from_now }
+          auth[:session][:email] = { value: auth['info']['email'], expires: 1.day.from_now }
         end
       else
         result = Auth::Result.new
@@ -293,6 +293,7 @@ class ::OAuth2BasicAuthenticator < Auth::ManagedAuthenticator
 
   def cookies
     # helpers not available in --api mode
+    Discourse.
     request.cookie_jar
   end
 end
