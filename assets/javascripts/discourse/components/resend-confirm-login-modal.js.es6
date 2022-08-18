@@ -11,10 +11,15 @@ export default Ember.Component.extend({
   @discourseComputed
   wavingHandURL: () => wavingHandURL(),
 
-  email: () => {
-    console.log('inside email');
+  init() {
+    console.log('inside init');
     console.log(this);
-    return atob(this.get('params').e);
+    this.set('resendEmail', atob(this.get('params').e));
+    this.set('resendUsername', atob(this.get('params').u));
+    if (history.replaceState) {
+      var cleanup = window.location.protocol + "//" + window.location.host + window.location.pathname;
+      history.replaceState({path:cleanup},'',cleanup);
+    }
   },
 
   didRender() {
@@ -28,8 +33,10 @@ export default Ember.Component.extend({
   actions: {
     sendActivationEmail() {
       console.log('action called');
-      console.log(this.get("accountCreated.username"));
-      resendActivationEmail(this.get("accountCreated.username")).then(() => {
+      console.log(this.get('resendUsername'));
+      console.log(this.get('resendEmail'));
+      resendActivationEmail(this.get('resendUsername')).then(() => {
+        console.log('resent conf email');
         this.transitionToRoute("account-created.resent");
       });
     },

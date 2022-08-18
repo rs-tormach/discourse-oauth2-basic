@@ -275,8 +275,13 @@ class ::OAuth2BasicAuthenticator < Auth::ManagedAuthenticator
 
         unless auth['info']['email_verified']
           require 'base64'
-          email_encoded = Base64.encode64(auth['info']['email'])
-          auth[:session][:destination_url] = Discourse.base_url_no_prefix + "?e=#{email_encoded}"
+          email_encoded = Base64.encode64(auth['info']['email'])['='] = ''
+          username = auth['info']['nickname'] if auth['info']['nickname']
+          unless username
+            username = auth['info']['name'][' '] = '_'
+          end
+          username_encoded = Base64.encode64(username)['='] = ''
+          auth[:session][:destination_url] = Discourse.base_url_no_prefix + "?e=#{email_encoded}&u=#{username_encoded}"
         end
       else
         result = Auth::Result.new
