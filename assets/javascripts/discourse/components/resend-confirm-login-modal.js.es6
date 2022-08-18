@@ -18,28 +18,19 @@ export default Ember.Component.extend({
   @discourseComputed
   wavingHandURL: () => wavingHandURL(),
 
-  toEmail: function () {
-    console.log('--toEmail()--');
-    console.log(this);
-    return this.get('resend_email');
-  },
-
-  toUser: function() {
-    console.log('--toUser()--');
-    console.log(this);
-    return this.get('resend_username');
-  },
+  toEmail: '',
+  toUser: '',
 
   init() {
     console.log('--init()--');
     console.log(this);
     if (this.getQueryVariable('e')) {
-      this.set('resend_email', atob(this.getQueryVariable('e')));
+      this.set('toEmail', atob(this.getQueryVariable('e')));
     }
     if (this.getQueryVariable('u')) {
-      this.set('resend_username', atob(this.getQueryVariable('u')));
+      this.set('toUser', atob(this.getQueryVariable('u')));
     }
-    if (history.replaceState && this.get('resend_email') && this.get('resend_username')) {
+    if (history.replaceState && this.get('toEmail') && this.get('toUser')) {
       var cleanup = window.location.protocol + "//" + window.location.host + window.location.pathname;
       history.replaceState({path:cleanup},'',cleanup);
     }
@@ -48,8 +39,8 @@ export default Ember.Component.extend({
   didRender() {
     console.log('--didRender()--');
     console.log(this);
-    console.log(this.get('resend_email'));
-    console.log(this.get('resend_username'));
+    console.log(this.get('toEmail'));
+    console.log(this.get('toUser'));
 
     $('.login-modal-body .login-left-side').addClass('hidden');
     $('.login-modal-body .login-right-side').addClass('hidden');
@@ -59,9 +50,9 @@ export default Ember.Component.extend({
   actions: {
     sendActivationEmail() {
       console.log('--sendActivationEmail()--');
-      console.log(this.get('resend_email'));
-      console.log(this.get('resend_username'));
-      resendActivationEmail(this.get('resend_email')).then(() => {
+      console.log(this.get('toEmail'));
+      console.log(this.get('toUser'));
+      resendActivationEmail(this.get('toUser')).then(() => {
         console.log('resent conf email');
         this.transitionToRoute("account-created.resent");
       });
