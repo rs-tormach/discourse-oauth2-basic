@@ -11,6 +11,9 @@ export default Ember.Component.extend({
   @discourseComputed
   wavingHandURL: () => wavingHandURL(),
 
+  resendEmail: undefined,
+  resendUsername: undefined,
+
   init() {
     console.log('inside init');
     console.log(this);
