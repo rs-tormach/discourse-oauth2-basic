@@ -18,19 +18,23 @@ export default Ember.Component.extend({
   wavingHandURL: () => wavingHandURL(),
 
   toEmail: () => {
-    return this.get('resend.email');
+    return this.get('resend_email');
   },
 
   toUser: () => {
-    return this.get('resend.username');
+    return this.get('resend_username');
   },
 
   init() {
     console.log('inside init');
     console.log(this);
-    this.set('resend.email', atob(this.getQueryVariable('e')));
-    this.set('resend.username', atob(this.getQueryVariable('u')));
-    if (history.replaceState) {
+    if (this.getQueryVariable('e')) {
+      this.set('resend_email', atob(this.getQueryVariable('e')));
+    }
+    if (this.getQueryVariable('u')) {
+      this.set('resend_username', atob(this.getQueryVariable('u')));
+    }
+    if (history.replaceState && this.get('resend_email') && this.get('resend_username')) {
       var cleanup = window.location.protocol + "//" + window.location.host + window.location.pathname;
       history.replaceState({path:cleanup},'',cleanup);
     }
@@ -39,8 +43,8 @@ export default Ember.Component.extend({
   didRender() {
     console.log('inside didrender');
     console.log(this);
-    console.log(this.get('resend.email'));
-    console.log(this.get('resend.username'));
+    console.log(this.get('resend_email'));
+    console.log(this.get('resend_username'));
 
     $('.login-modal-body .login-left-side').addClass('hidden');
     $('.login-modal-body .login-right-side').addClass('hidden');
@@ -50,9 +54,9 @@ export default Ember.Component.extend({
   actions: {
     sendActivationEmail() {
       console.log('action called');
-      console.log(this.get('resend.email'));
-      console.log(this.get('resend.username'));
-      resendActivationEmail(this.get('resend.email')).then(() => {
+      console.log(this.get('resend_email'));
+      console.log(this.get('resend_username'));
+      resendActivationEmail(this.get('resend_email')).then(() => {
         console.log('resent conf email');
         this.transitionToRoute("account-created.resent");
       });
