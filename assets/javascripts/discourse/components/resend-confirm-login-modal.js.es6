@@ -5,16 +5,21 @@ import { wavingHandURL } from "discourse/lib/waving-hand-url";
 const { computed: { alias }, observer } = Ember
 
 export default Ember.Component.extend({
-  routing: Ember.inject.service('-routing'),
-  params: alias('routing.router.currentState.routerJsState.fullQueryParams'),
+  //routing: Ember.inject.service('-routing'),
+  //params: alias('routing.router.currentState.routerJsState.fullQueryParams'),
 
   @discourseComputed
   wavingHandURL: () => wavingHandURL(),
 
-  email: undefined,
-  username: undefined,
+  toEmail: () => {
+    return this.get('resend.email');
+  },
 
-  init() {
+  toUser: () => {
+    return this.get('resend.username');
+  },
+
+  __init() {
     console.log('inside init');
     console.log(this);
     this.set('email', atob(this.get('params').e));
@@ -28,8 +33,8 @@ export default Ember.Component.extend({
   didRender() {
     console.log('inside didrender');
     console.log(this);
-    console.log(this.email);
-    console.log(this.username);
+    console.log(this.get('resend.email'));
+    console.log(this.get('resend.username'));
 
     $('.login-modal-body .login-left-side').addClass('hidden');
     $('.login-modal-body .login-right-side').addClass('hidden');
@@ -39,9 +44,9 @@ export default Ember.Component.extend({
   actions: {
     sendActivationEmail() {
       console.log('action called');
-      console.log(this.email);
-      console.log(this.username);
-      resendActivationEmail(this.email).then(() => {
+      console.log(this.get('resend.email'));
+      console.log(this.get('resend.username'));
+      resendActivationEmail(this.get('resend.email')).then(() => {
         console.log('resent conf email');
         this.transitionToRoute("account-created.resent");
       });
