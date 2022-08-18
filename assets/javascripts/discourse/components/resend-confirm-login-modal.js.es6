@@ -6,7 +6,7 @@ const { computed: { alias }, observer } = Ember
 
 export default Ember.Component.extend({
   routing: Ember.inject.service('-routing'),
-  params: alias('routing.router.currentState.routerJsState.fullQueryParams')
+  params: alias('routing.router.currentState.routerJsState.fullQueryParams'),
 
   @discourseComputed
   wavingHandURL: () => wavingHandURL(),
