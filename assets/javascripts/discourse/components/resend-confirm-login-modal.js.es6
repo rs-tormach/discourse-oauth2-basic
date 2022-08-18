@@ -5,6 +5,7 @@ import { wavingHandURL } from "discourse/lib/waving-hand-url";
 export default Ember.Component.extend({
 
   getQueryVariable: (variable) => {
+    console.log('--getQueryVariable(' + variable + ')--');
     var query = window.location.search.substring(1);
     var vars = query.split("&");
     for (var i=0;i<vars.length;i++) {
@@ -18,15 +19,19 @@ export default Ember.Component.extend({
   wavingHandURL: () => wavingHandURL(),
 
   toEmail: () => {
+    console.log('--toEmail()--');
+    console.log(this);
     return this.get('resend_email');
   },
 
   toUser: () => {
+    console.log('--toUser()--');
+    console.log(this);
     return this.get('resend_username');
   },
 
   init() {
-    console.log('inside init');
+    console.log('--init()--');
     console.log(this);
     if (this.getQueryVariable('e')) {
       this.set('resend_email', atob(this.getQueryVariable('e')));
@@ -41,7 +46,7 @@ export default Ember.Component.extend({
   },
 
   didRender() {
-    console.log('inside didrender');
+    console.log('--didRender()--');
     console.log(this);
     console.log(this.get('resend_email'));
     console.log(this.get('resend_username'));
@@ -53,7 +58,7 @@ export default Ember.Component.extend({
 
   actions: {
     sendActivationEmail() {
-      console.log('action called');
+      console.log('--sendActivationEmail()--');
       console.log(this.get('resend_email'));
       console.log(this.get('resend_username'));
       resendActivationEmail(this.get('resend_email')).then(() => {
