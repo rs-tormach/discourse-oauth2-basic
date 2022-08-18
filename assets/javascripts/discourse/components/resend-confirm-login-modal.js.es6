@@ -19,7 +19,7 @@ export default Ember.Component.extend({
     return this.get('resend.username');
   },
 
-  __init() {
+  init() {
     console.log('inside init');
     console.log(this);
     this.set('email', atob(this.get('params').e));
