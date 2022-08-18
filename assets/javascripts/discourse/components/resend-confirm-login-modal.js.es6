@@ -11,10 +11,7 @@ export default Ember.Component.extend({
   @discourseComputed
   wavingHandURL: () => wavingHandURL(),
 
-  @discourseComputed
   email: undefined,
-
-  @discourseComputed
   username: undefined,
 
   init() {
@@ -29,7 +26,10 @@ export default Ember.Component.extend({
   },
 
   didRender() {
+    console.log('inside didrender');
     console.log(this);
+    console.log(this.email);
+    console.log(this.username);
 
     $('.login-modal-body .login-left-side').addClass('hidden');
     $('.login-modal-body .login-right-side').addClass('hidden');
@@ -39,9 +39,9 @@ export default Ember.Component.extend({
   actions: {
     sendActivationEmail() {
       console.log('action called');
-      console.log(this.get('resendUsername'));
-      console.log(this.get('resendEmail'));
-      resendActivationEmail(this.get('resendUsername')).then(() => {
+      console.log(this.email);
+      console.log(this.username);
+      resendActivationEmail(this.email).then(() => {
         console.log('resent conf email');
         this.transitionToRoute("account-created.resent");
       });
