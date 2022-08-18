@@ -274,7 +274,9 @@ class ::OAuth2BasicAuthenticator < Auth::ManagedAuthenticator
         end
 
         unless auth['info']['email_verified']
-          auth[:session][:destination_url] = "https://localhost/?email=#{auth['info']['email']}"
+          require 'base64'
+          email_encoded = Base64.encode64(auth['info']['email'])
+          auth[:session][:destination_url] = Discourse.base_url_no_prefix + "?e=#{email_encoded}"
         end
       else
         result = Auth::Result.new
