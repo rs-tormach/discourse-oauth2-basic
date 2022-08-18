@@ -4,7 +4,7 @@ import { wavingHandURL } from "discourse/lib/waving-hand-url";
 
 export default Ember.Component.extend({
 
-  getQueryVariable: (variable) => {
+  getQueryVariable: function (variable) {
     console.log('--getQueryVariable(' + variable + ')--');
     var query = window.location.search.substring(1);
     var vars = query.split("&");
@@ -18,13 +18,13 @@ export default Ember.Component.extend({
   @discourseComputed
   wavingHandURL: () => wavingHandURL(),
 
-  toEmail: () => {
+  toEmail: function () {
     console.log('--toEmail()--');
     console.log(this);
     return this.get('resend_email');
   },
 
-  toUser: () => {
+  toUser: function() {
     console.log('--toUser()--');
     console.log(this);
     return this.get('resend_username');
