@@ -16,10 +16,10 @@ export default Ember.Component.extend({
     console.log(this);
     this.set('resendEmail', atob(this.get('params').e));
     this.set('resendUsername', atob(this.get('params').u));
-    if (history.replaceState) {
+    /*if (history.replaceState) {
       var cleanup = window.location.protocol + "//" + window.location.host + window.location.pathname;
       history.replaceState({path:cleanup},'',cleanup);
-    }
+    }*/
   },
 
   didRender() {
