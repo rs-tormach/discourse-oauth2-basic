@@ -12,7 +12,7 @@ export default Ember.Component.extend({
   didRender(): {
     this.toEmail = 'updated@tormach.com';
     this.toUser = 'updated';
-  }
+  },
 
   actions: {
     sendActivationEmail() {
