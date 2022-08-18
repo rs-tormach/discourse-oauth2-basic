@@ -12,7 +12,9 @@ export default Ember.Component.extend({
   wavingHandURL: () => wavingHandURL(),
 
   email: () => {
-    return atob(this.params.e);
+    console.log('inside email');
+    console.log(this);
+    return atob(this.get('params').e);
   },
 
   didRender() {
