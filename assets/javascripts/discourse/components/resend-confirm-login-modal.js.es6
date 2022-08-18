@@ -9,7 +9,7 @@ export default Ember.Component.extend({
   toEmail: 'rsteckman@tormach.com',
   toUser: 'rsteckman',
 
-  didRender(): {
+  didRender() {
     this.toEmail = 'updated@tormach.com';
     this.toUser = 'updated';
   },
