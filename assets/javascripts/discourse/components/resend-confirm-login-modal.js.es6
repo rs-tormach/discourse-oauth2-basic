@@ -11,14 +11,17 @@ export default Ember.Component.extend({
   @discourseComputed
   wavingHandURL: () => wavingHandURL(),
 
-  resendEmail: undefined,
-  resendUsername: undefined,
+  @discourseComputed
+  email: undefined,
+
+  @discourseComputed
+  username: undefined,
 
   init() {
     console.log('inside init');
     console.log(this);
-    this.set('resendEmail', atob(this.get('params').e));
-    this.set('resendUsername', atob(this.get('params').u));
+    this.set('email', atob(this.get('params').e));
+    this.set('username', atob(this.get('params').u));
     if (history.replaceState) {
       var cleanup = window.location.protocol + "//" + window.location.host + window.location.pathname;
       history.replaceState({path:cleanup},'',cleanup);
