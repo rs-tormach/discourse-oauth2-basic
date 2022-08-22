@@ -38,7 +38,8 @@ export default Ember.Component.extend({
   actions: {
     sendActivationEmail() {
       resendActivationEmail(this.get('username')).then(() => {
-        this.transitionToRoute("account-created.resent");
+        this.flash(I18n.t("login.sent_activation_email_again", {currentEmail: this.get('email')}));
+        this.send("closeModal");
       });
     },
   },
