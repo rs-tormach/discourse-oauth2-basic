@@ -273,15 +273,16 @@ class ::OAuth2BasicAuthenticator < Auth::ManagedAuthenticator
           auth['extra'][detail] = fetched_user_details["extra:#{detail}"]
         end
 
-        unless auth['info']['email_verified']
-          require 'base64'
-          email_encoded = Base64.encode64(auth['info']['email']).gsub('=', '')
-          username = auth['info']['nickname'] if auth['info']['nickname']
-          unless username
-            username = auth['info']['name']
+        user_associated_account = UserAssociatedAccount.find_by(provider_uid: auth['uid'])
+        if user_associated_account
+          inactive_user = User.find_by(id: user_associated_account.user_id, active: false)
+          if inactive_user
+            require 'base64'
+            email_encoded = Base64.encode64(auth['info']['email']).gsub('=', '')
+            username_encoded = Base64.encode64(inactive_user.username).gsub('=', '')
+            auth[:session][SessionController::ACTIVATE_USER_KEY] = inactive_user.id
+            auth[:session][:destination_url] = Discourse.base_url_no_prefix + "?e=#{email_encoded}&u=#{username_encoded}&key=#{SessionController::ACTIVATE_USER_KEY}"
           end
-          username_encoded = Base64.encode64(username.gsub(' ', '_')).gsub('=', '')
-          auth[:session][:destination_url] = Discourse.base_url_no_prefix + "?e=#{email_encoded}&u=#{username_encoded}"
         end
       else
         result = Auth::Result.new
