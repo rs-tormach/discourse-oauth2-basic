@@ -9,7 +9,6 @@
 
 enabled_site_setting :oauth2_enabled
 
-#require 'action_dispatch/middleware/cookies'
 class ::OmniAuth::Strategies::Oauth2Basic < ::OmniAuth::Strategies::OAuth2
   option :name, "oauth2_basic"
 

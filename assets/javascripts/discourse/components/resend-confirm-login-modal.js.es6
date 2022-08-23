@@ -37,8 +37,10 @@ export default Ember.Component.extend({
   },
   actions: {
     sendActivationEmail() {
+      $('.resend-activation-button').prop("disabled",true);
       resendActivationEmail(this.get('username')).then(() => {
-        $('.resend-activation-button').prop("disabled",true);
+        $('#not-activated').addClass('hidden');
+        $('#sent-activation').removeClass('hidden');
       });
     },
   },
