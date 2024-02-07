@@ -1,8 +1,10 @@
+import Component from '@ember/component';
+
 import discourseComputed from "discourse-common/utils/decorators";
 import { resendActivationEmail } from "discourse/lib/user-activation";
 import { wavingHandURL } from "discourse/lib/waving-hand-url";
 
-export default Ember.Component.extend({
+export default Component.extend({
   @discourseComputed
   wavingHandURL: () => wavingHandURL(),
   getQueryVariable: function (variable) {
