@@ -343,6 +343,8 @@ class ::OAuth2BasicAuthenticator < Auth::ManagedAuthenticator
             username_encoded = Base64.encode64(inactive_user.username).gsub('=', '')
             auth[:session][SessionController::ACTIVATE_USER_KEY] = inactive_user.id
             auth[:session][:destination_url] = Discourse.base_url_no_prefix + "?e=#{email_encoded}&u=#{username_encoded}"
+          end
+        end
       else
         result = Auth::Result.new
         result.failed = true
