@@ -4,6 +4,8 @@ require "rails_helper"
 
 describe OAuth2BasicAuthenticator do
   describe "after_authenticate" do
+    before { SiteSetting.oauth2_user_json_url = "https://provider.com/user" }
+
     let(:user) { Fabricate(:user) }
     let(:authenticator) { OAuth2BasicAuthenticator.new }
 
@@ -74,9 +76,7 @@ describe OAuth2BasicAuthenticator do
         { status: 200, body: '{"account":{"email":"newemail@example.com"}}' }
       end
 
-      let (:fail_response) do
-        { status: 403 }
-      end
+      let(:fail_response) { { status: 403 } }
 
       it "works" do
         stub_request(:get, SiteSetting.oauth2_user_json_url).to_return(success_response)
@@ -124,11 +124,59 @@ describe OAuth2BasicAuthenticator do
           expect(associated_account.extra[custom_path]).to eq("received")
         end
       end
+
+      describe "required attributes" do
+        after { DiscoursePluginRegistry.reset_register!(:oauth2_basic_required_json_paths) }
+
+        it "'authenticates' successfully if required json path is fulfilled" do
+          DiscoursePluginRegistry.register_oauth2_basic_additional_json_path(
+            "account.is_legit",
+            Plugin::Instance.new,
+          )
+          DiscoursePluginRegistry.register_oauth2_basic_required_json_path(
+            { path: "extra:account.is_legit", required_value: true },
+            Plugin::Instance.new,
+          )
+
+          response = {
+            status: 200,
+            body: '{"account":{"email":"newemail@example.com","is_legit":true}}',
+          }
+          stub_request(:get, SiteSetting.oauth2_user_json_url).to_return(response)
+
+          result = authenticator.after_authenticate(auth)
+          expect(result.failed).to eq(false)
+        end
+
+        it "fails 'authentication' if required json path is unfulfilled" do
+          DiscoursePluginRegistry.register_oauth2_basic_additional_json_path(
+            "account.is_legit",
+            Plugin::Instance.new,
+          )
+          DiscoursePluginRegistry.register_oauth2_basic_required_json_path(
+            {
+              path: "extra:account.is_legit",
+              required_value: true,
+              error_message: "You're not legit",
+            },
+            Plugin::Instance.new,
+          )
+          response = {
+            status: 200,
+            body: '{"account":{"email":"newemail@example.com","is_legit":false}}',
+          }
+          stub_request(:get, SiteSetting.oauth2_user_json_url).to_return(response)
+
+          result = authenticator.after_authenticate(auth)
+          expect(result.failed).to eq(true)
+          expect(result.failed_reason).to eq("You're not legit")
+        end
+      end
     end
 
     describe "avatar downloading" do
       before do
-        SiteSetting.queue_jobs = true
+        Jobs.run_later!
         SiteSetting.oauth2_fetch_user_details = true
         SiteSetting.oauth2_email_verified = true
       end
