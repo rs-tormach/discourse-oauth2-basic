@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 # name: discourse-oauth2-basic
-# about: Generic OAuth2 Plugin
+# about: Allows users to login to your forum using a basic OAuth2 provider.
+# meta_topic_id: 33879
 # version: 0.3
 # authors: Robin Ward
 # url: https://github.com/discourse/discourse-oauth2-basic
-# transpile_js: true
 
 enabled_site_setting :oauth2_enabled
 
@@ -49,11 +49,13 @@ require "faraday/logging/formatter"
 class OAuth2FaradayFormatter < Faraday::Logging::Formatter
   def request(env)
     warn <<~LOG
-      OAuth2 Debugging: request #{env.method.upcase} #{env.url.to_s}
+      OAuth2 Debugging: request #{env.method.upcase} #{env.url}
 
-      Headers: #{env.request_headers}
+      Headers:
+      #{env.request_headers.to_yaml}
 
-      Body: #{env[:body]}
+      Body:
+      #{env[:body].to_yaml}
     LOG
   end
 
@@ -61,11 +63,13 @@ class OAuth2FaradayFormatter < Faraday::Logging::Formatter
     warn <<~LOG
       OAuth2 Debugging: response status #{env.status}
 
-      From #{env.method.upcase} #{env.url.to_s}
+      From #{env.method.upcase} #{env.url}
 
-      Headers: #{env.response_headers}
+      Headers:
+      #{env.request_headers.to_yaml}
 
-      Body: #{env[:body]}
+      Body:
+      #{env[:body].to_yaml}
     LOG
   end
 end
@@ -73,6 +77,18 @@ end
 # You should use this register if you want to add custom paths to traverse the user details JSON.
 # We'll store the value in the user associated account's extra attribute hash using the full path as the key.
 DiscoursePluginRegistry.define_filtered_register :oauth2_basic_additional_json_paths
+
+# After authentication, we'll use this to confirm that the registered json paths are fulfilled, or display an error.
+# This requires SiteSetting.oauth2_fetch_user_details? to be true, and can be used with
+# DiscoursePluginRegistry.oauth2_basic_additional_json_paths.
+#
+# Example usage:
+# DiscoursePluginRegistry.register_oauth2_basic_required_json_path({
+#   path: "extra:data.is_allowed_user",
+#   required_value: true,
+#   error_message: I18n.t("auth.user_not_allowed")
+# }, self)
+DiscoursePluginRegistry.define_filtered_register :oauth2_basic_required_json_paths
 
 class ::OAuth2BasicAuthenticator < Auth::ManagedAuthenticator
   def name
@@ -223,19 +239,26 @@ class ::OAuth2BasicAuthenticator < Auth::ManagedAuthenticator
     user_json_url = SiteSetting.oauth2_user_json_url.sub(":token", token.to_s).sub(":id", id.to_s)
     user_json_method = SiteSetting.oauth2_user_json_url_method.downcase.to_sym
 
-    log("user_json_url: #{user_json_method} #{user_json_url}")
-
     bearer_token = "Bearer #{token}"
     connection = Faraday.new { |f| f.adapter FinalDestination::FaradayAdapter }
     headers = { "Authorization" => bearer_token, "Accept" => "application/json" }
     user_json_response = connection.run_request(user_json_method, user_json_url, nil, headers)
 
-    log("user_json_response: #{user_json_response.inspect}")
+    log <<-LOG
+      user_json request: #{user_json_method} #{user_json_url}
+
+      request headers: #{headers}
+
+      response status: #{user_json_response.status}
+
+      response body:
+      #{user_json_response.body}
+    LOG
 
     if user_json_response.status == 200
       user_json = JSON.parse(user_json_response.body)
 
-      log("user_json: #{user_json}")
+      log("user_json:\n#{user_json.to_yaml}")
 
       result = {}
       if user_json.present?
@@ -270,11 +293,22 @@ class ::OAuth2BasicAuthenticator < Auth::ManagedAuthenticator
   end
 
   def after_authenticate(auth, existing_account: nil)
-    log(
-      "after_authenticate response: \n\ncreds: #{auth["credentials"].to_hash}\nuid: #{auth["uid"]}\ninfo: #{auth["info"].to_hash}\nextra: #{auth["extra"].to_hash}",
-    )
+    log <<-LOG
+      after_authenticate response:
 
-    if SiteSetting.oauth2_fetch_user_details?
+      creds:
+      #{auth["credentials"].to_hash.to_yaml}
+
+      uid: #{auth["uid"]}
+
+      info:
+      #{auth["info"].to_hash.to_yaml}
+
+      extra:
+      #{auth["extra"].to_hash.to_yaml}
+    LOG
+
+    if SiteSetting.oauth2_fetch_user_details? && SiteSetting.oauth2_user_json_url.present?
       if fetched_user_details = fetch_user_details(auth["credentials"]["token"], auth["uid"])
         auth["uid"] = fetched_user_details[:user_id] if fetched_user_details[:user_id]
         auth["info"]["nickname"] = fetched_user_details[:username] if fetched_user_details[
@@ -291,6 +325,15 @@ class ::OAuth2BasicAuthenticator < Auth::ManagedAuthenticator
           auth["extra"][detail] = fetched_user_details["extra:#{detail}"]
         end
 
+        DiscoursePluginRegistry.oauth2_basic_required_json_paths.each do |x|
+          if fetched_user_details[x[:path]] != x[:required_value]
+            result = Auth::Result.new
+            result.failed = true
+            result.failed_reason = x[:error_message]
+            return result
+          end
+        end
+
         user_associated_account = UserAssociatedAccount.find_by(provider_uid: auth['uid'])
         if user_associated_account
           inactive_user = User.find_by(id: user_associated_account.user_id, active: false)
@@ -300,8 +343,6 @@ class ::OAuth2BasicAuthenticator < Auth::ManagedAuthenticator
             username_encoded = Base64.encode64(inactive_user.username).gsub('=', '')
             auth[:session][SessionController::ACTIVATE_USER_KEY] = inactive_user.id
             auth[:session][:destination_url] = Discourse.base_url_no_prefix + "?e=#{email_encoded}&u=#{username_encoded}"
-          end
-        end
       else
         result = Auth::Result.new
         result.failed = true
