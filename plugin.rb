@@ -338,8 +338,8 @@ class ::OAuth2BasicAuthenticator < Auth::ManagedAuthenticator
         if user_associated_account
           inactive_user = User.find_by(id: user_associated_account.user_id, active: false)
           if inactive_user
-            secure_session['oauth2_email'] = auth['info']['email']
-            secure_session['oauth2_username'] = inactive_user.username
+            store_preloaded('oauth2_email', auth['info']['email'])
+            store_preloaded('oauth2_username'], inactive_user.username)
             auth[:session][SessionController::ACTIVATE_USER_KEY] = inactive_user.id
             auth[:session][:destination_url] = Discourse.base_url_no_prefix
           end
