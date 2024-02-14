@@ -9,6 +9,15 @@ export default class ResendConfirmLoginModal extends Component
   username = null;
   renderOk = false;
 
+  getCookieValue(name) 
+  {
+    const regex = new RegExp(`(^| )${name}=([^;]+)`);
+    const match = document.cookie.match(regex);
+    if (match) {
+      return match[2];
+    }
+  }
+
   get wavingHandURL() {
     return wavingHandURL();
   }
@@ -16,10 +25,12 @@ export default class ResendConfirmLoginModal extends Component
   init() {
     console.log('ResendConfirmLoginModal init entry'); //eslint-disable-line no-console
     super.init(...arguments);
-    const e = this.session.get('oauth2_email');
-    console.log('Found in session:' + e); //eslint-disable-line no-console
-
-    console.log(this.session); //eslint-disable-line no-console
+    const e = this.getCookieValue("_oa2e");
+    this.set('email', window.atob(e));
+    console.log('Found ' + e + ' which is ' + this.get('email')); //eslint-disable-line no-console
+    const u = this.getCookieValue("_oa2u");
+    this.set('username', window.atob(u));
+    console.log('Found ' + u + ' which is ' + this.get('username')); //eslint-disable-line no-console
   }
 
   didRender() {

@@ -363,8 +363,9 @@ auth_provider title_setting: "oauth2_button_title", authenticator: OAuth2BasicAu
 DiscourseEvent.on(:after_auth) do | authenticator, auth_result, session, cookies, request|
   if !auth_result.failed && !auth_result.user.active
     # didn't fail authentication, but not yet activated for discourse
-    session["oauth2_email"] = auth_result.email
-    session["oauth2_username"] = auth_result.user.username
+    require 'base64'
+    cookies["_oa2e"] = Base64.encode64(auth_result.email).gsub('=', '')
+    cookies["_oa2u"] = Base64.encode64(auth_result.user.username).gsub('=', '')
   end
 end
 
