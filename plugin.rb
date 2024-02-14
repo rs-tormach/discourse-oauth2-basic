@@ -338,11 +338,10 @@ class ::OAuth2BasicAuthenticator < Auth::ManagedAuthenticator
         if user_associated_account
           inactive_user = User.find_by(id: user_associated_account.user_id, active: false)
           if inactive_user
-            require 'base64'
-            email_encoded = Base64.encode64(auth['info']['email']).gsub('=', '')
-            username_encoded = Base64.encode64(inactive_user.username).gsub('=', '')
+            session['oauth2_email'] = auth['info']['email']
+            session['oauth2_username'] = inactive_user.username
             auth[:session][SessionController::ACTIVATE_USER_KEY] = inactive_user.id
-            auth[:session][:destination_url] = Discourse.base_url_no_prefix + "?e=#{email_encoded}&u=#{username_encoded}"
+            auth[:session][:destination_url] = Discourse.base_url_no_prefix
           end
         end
       else
