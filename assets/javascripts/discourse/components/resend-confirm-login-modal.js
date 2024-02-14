@@ -4,7 +4,7 @@ import { resendActivationEmail } from "discourse/lib/user-activation";
 import { wavingHandURL } from "discourse/lib/waving-hand-url";
 import discourseComputed from "discourse-common/utils/decorators";
 
-export default class ResendConfirmLoginModal extends Component.extend()
+export default class ResendConfirmLoginModal extends Component
 {
   email = null;
   username = null;
