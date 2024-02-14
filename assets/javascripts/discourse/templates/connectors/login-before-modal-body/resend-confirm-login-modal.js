@@ -26,11 +26,9 @@ export default class ResendConfirmLoginModal extends Component
     console.log('ResendConfirmLoginModal init entry'); //eslint-disable-line no-console
     super.init(...arguments);
     const e = this.getCookieValue("_oa2e");
-    this.set('email', window.atob(e));
-    console.log('Found ' + e + ' which is ' + this.get('email')); //eslint-disable-line no-console
+    this.set('email', window.atob(e.replace('%0A', '')));
     const u = this.getCookieValue("_oa2u");
-    this.set('username', window.atob(u));
-    console.log('Found ' + u + ' which is ' + this.get('username')); //eslint-disable-line no-console
+    this.set('username', window.atob(u.replace('%0A', '')));
   }
 
   didRender() {
