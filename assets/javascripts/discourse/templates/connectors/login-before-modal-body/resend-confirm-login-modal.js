@@ -23,7 +23,6 @@ export default class ResendConfirmLoginModal extends Component
   }
 
   init() {
-    console.log('ResendConfirmLoginModal init entry'); //eslint-disable-line no-console
     super.init(...arguments);
     const e = this.getCookieValue("_oa2e");
     this.set('email', window.atob(e.replace('%0A', '')));
@@ -32,7 +31,6 @@ export default class ResendConfirmLoginModal extends Component
   }
 
   didRender() {
-    console.log('ResendConfirmLoginModal didRender entry'); //eslint-disable-line no-console
     super.didRender(...arguments);
     const modalBodyLeft = document.querySelectorAll('.login-modal-body .login-left-side')[1];
     modalBodyLeft.className += ' hidden';
@@ -50,7 +48,7 @@ export default class ResendConfirmLoginModal extends Component
       const notActivated = document.getElementById('not-activated');
       notActivated.className += ' hidden';
       const sentActivation = document.getElementById('sent-activation');
-      sentActivation.className = sentActivation.replace(' hidden', '');
+      sentActivation.className = '';
     });
   }
 }
