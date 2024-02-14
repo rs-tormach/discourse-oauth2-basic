@@ -338,8 +338,7 @@ class ::OAuth2BasicAuthenticator < Auth::ManagedAuthenticator
         if user_associated_account
           inactive_user = User.find_by(id: user_associated_account.user_id, active: false)
           if inactive_user
-            store_preloaded('oauth2_email', auth['info']['email'])
-            store_preloaded('oauth2_username', inactive_user.username)
+            auth[:session][:extra_data] = "inactive_resend//SEP//#{auth['info']['email']}//SEP//#{inactive_user.username}"
             auth[:session][SessionController::ACTIVATE_USER_KEY] = inactive_user.id
             auth[:session][:destination_url] = Discourse.base_url_no_prefix
           end
@@ -361,6 +360,15 @@ class ::OAuth2BasicAuthenticator < Auth::ManagedAuthenticator
 end
 
 auth_provider title_setting: "oauth2_button_title", authenticator: OAuth2BasicAuthenticator.new
+
+#DiscourseEvent.trigger(:after_auth, authenticator, @auth_result, session, cookies, request)
+DiscourseEvent.on(:after_auth) do | authenticator, auth_result, session, cookies, request|
+  if auth_result.session.extra_data.start_with.nil? && auth_result.session.extra_data.start_with?("inactive_resend")
+    data = auth_result.session.extra_data.split("//SEP//")
+    session["oauth2_email"] = data[1]
+    session["oauth2_username"] = data[2]
+  end
+end
 
 load File.expand_path(
        "../lib/validators/oauth2_basic/oauth2_fetch_user_details_validator.rb",

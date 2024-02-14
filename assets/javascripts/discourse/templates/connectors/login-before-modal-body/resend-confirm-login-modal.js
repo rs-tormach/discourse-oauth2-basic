@@ -16,9 +16,10 @@ export default class ResendConfirmLoginModal extends Component
   init() {
     console.log('ResendConfirmLoginModal init entry'); //eslint-disable-line no-console
     super.init(...arguments);
-    const e = session.get('oauth2_email');
+    const e = this.session.get('oauth2_email');
     console.log('Found in session:' + e); //eslint-disable-line no-console
-    console.log('ResendConfirmLoginModal completed with' + this.get('renderOk')); //eslint-disable-line no-console
+
+    console.log(this.session); //eslint-disable-line no-console
   }
 
   didRender() {
