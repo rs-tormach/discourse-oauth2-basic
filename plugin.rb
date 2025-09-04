@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-# name: discourse-oauth2-basic
+# name: discourse-oauth2-tormach
 # about: Allows users to login to your forum using a basic OAuth2 provider.
 # meta_topic_id: 33879
 # version: 0.3
 # authors: Robin Ward
-# url: https://github.com/discourse/discourse-oauth2-basic
+# url: https://github.com/rs-tormach/discourse-oauth2-tormach
 
 enabled_site_setting :oauth2_enabled
 

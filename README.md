@@ -1,4 +1,4 @@
-## discourse-oauth2-basic
+## discourse-oauth2-tormach
 
 This plugin allows you to use a basic OAuth2 provider as authentication for
 Discourse. It should work with many providers, with the caveat that they
@@ -160,7 +160,7 @@ issues with the plugin, including bugs and feature requests.
 Make sure the plugin has been installed, then from the discourse directory run:
 
 ```
-LOAD_PLUGINS=1 bundle exec rspec plugins/discourse-oauth2-basic/spec/plugin_spec.rb
+LOAD_PLUGINS=1 bundle exec rspec plugins/discourse-oauth2-tormach/spec/plugin_spec.rb
 ```
 
 ### License
